@@ -21,7 +21,8 @@
             android:name="com.examples.jualbelihp.FormHandphone"
             android:label="@string/title_activity_add_new" >
         </activity>
-        <activity android:name="com.examples.jualbelihp.DetailHandphone"
+        <activity
+            android:name="com.examples.jualbelihp.DetailHandphone"
             android:label="@string/title_activity_detail_handphone" >
         </activity>
     </application>

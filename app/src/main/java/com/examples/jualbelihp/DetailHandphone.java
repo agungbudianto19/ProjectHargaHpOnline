@@ -1,13 +1,11 @@
 package com.examples.jualbelihp;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -26,8 +24,9 @@ public class DetailHandphone extends AppCompatActivity {
     public static final String urlDelete = "delete_phone.php";
     private EditText textNama, textHarga;
     private Handphone handphone;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_handphone);
         handphone = new Handphone();
@@ -47,24 +46,28 @@ public class DetailHandphone extends AppCompatActivity {
         handphone.setHarga(harga);
     }
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.activity_main_action, menu);
         return true;
     }
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case android.R.id.home: goToMainActivity();
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                goToMainActivity();
                 break;
-            case R.id.action_menu_edit: Intent in = new Intent(getApplicationContext(),FormHandphone.class);
+            case R.id.action_menu_edit:
+                Intent in = new Intent(getApplicationContext(), FormHandphone.class);
                 in.putExtra("id", handphone.getId().toString());
-                in.putExtra("nama",handphone.getNama());
+                in.putExtra("nama", handphone.getNama());
                 in.putExtra("harga", handphone.getHarga());
                 startActivity(in);
                 break;
-            case R.id.action_menu_delete: delete();
+            case R.id.action_menu_delete:
+                delete();
                 break;
         }
+
         return super.onOptionsItemSelected(item);
     }
     private void goToMainActivity(){
@@ -72,17 +75,19 @@ public class DetailHandphone extends AppCompatActivity {
         in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(in);
     }
-    private void delete() {
+    private void delete(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Delete"+handphone.getNama()+" ?");
+        builder.setMessage("Delete"+handphone.getNama()+"?");
         builder.setTitle("Delete");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 deleteData();
-                Toast.makeText(getApplicationContext(), "deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"deleted",Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
@@ -91,16 +96,16 @@ public class DetailHandphone extends AppCompatActivity {
         alert.setIcon(android.R.drawable.ic_menu_delete);
         alert.show();
     }
-    public void deleteData() {
+    public void deleteData(){
         try {
             ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
             nameValuePairs.add(new BasicNameValuePair("id", String.valueOf(handphone.getId())));
-            AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener() {
+            AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener(){
                 @Override
                 public void onPostExecute(String result) {
-                    Log.d("TAG","Delete :" +result);
-                    if (result.equals("timeout") || result.trim().equalsIgnoreCase("Tidak Dapat Terkoneksi Ke Database")){
-                        Toast.makeText(getBaseContext(), "Tidak Dapat Terkoneksi Dengan Server", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "Delete :" +result);
+                    if (result.equals("timeout") || result.trim().equalsIgnoreCase("Tidak dapat terkoneksi ke Database")){
+                        Toast.makeText(getBaseContext(), "Tidak dapat terkoneksi dengan server", Toast.LENGTH_SHORT).show();
                     }else{
                         goToMainActivity();
                     }
@@ -108,10 +113,10 @@ public class DetailHandphone extends AppCompatActivity {
             });
             task.showdialog=true;
             task.message="Proses Delete Data Harap Tunggu..";
-            task.applicationContext =DetailHandphone.this;
-            task.mNoteItWebUrl =urlDelete;
+            task.applicationContext=DetailHandphone.this;
+            task.mNoteItWebUrl = urlDelete;
             task.execute();
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
     }

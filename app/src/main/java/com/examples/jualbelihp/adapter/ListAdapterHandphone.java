@@ -5,32 +5,39 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-
+import android.widget.Filter;
 import com.examples.jualbelihp.R;
 import com.examples.jualbelihp.model.Handphone;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class ListAdapterHandphone extends BaseAdapter implements Filterable {
     private Context context;
-    private List<Handphone>list, filterd;
-    public  ListAdapterHandphone(Context context, List<Handphone> list){
+    private List<Handphone> list, filterd;
+    public ListAdapterHandphone(Context context, List<Handphone> list){
         this.context = context;
         this.list = list;
         this.filterd = this.list;
     }
     @Override
-    public  int getCount() { return filterd.size(); }
+    public int getCount() {
+        return filterd.size();
+    }
     @Override
-    public Object getItem(int position) { return filterd.get(position); }
+    public Object getItem(int position){
+        return filterd.get(position);
+    }
     @Override
-    public long getItemId(int position) { return position; }
+    public long getItemId(int position){
+        return position;
+    }
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent){
         if (convertView == null){
             LayoutInflater inflater = LayoutInflater.from(this.context);
             convertView = inflater.inflate(R.layout.list_row, null);
@@ -43,27 +50,27 @@ public class ListAdapterHandphone extends BaseAdapter implements Filterable {
         return convertView;
     }
     @Override
-    public Filter getFilter() {
+    public Filter getFilter(){
         HandphoneFilter filter = new HandphoneFilter();
-        return  filter;
+        return filter;
     }
-    private  class HandphoneFilter extends Filter {
+    private class HandphoneFilter extends Filter{
         @Override
-        protected FilterResult performFiltering(CharSequence constraint) {
+        protected FilterResults performFiltering(CharSequence constraint){
             List<Handphone> filteredData = new ArrayList<Handphone>();
-            FilterResults results = new FilterResults();
+            FilterResults result = new FilterResults();
             String filterString = constraint.toString().toLowerCase();
-            for (Handphone hp : list) {
-                if (hp.getNama().toLowerCase().contains(filterString)) {
+            for (Handphone hp : list){
+                if (hp.getNama().toLowerCase().contains(filterString)){
                     filteredData.add(hp);
                 }
             }
-            results.count = filteredData.size();
-            results.values = filteredData;
+            result.count = filteredData.size();
+            result.values = filteredData;
             return result;
         }
         @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
+        protected void publishResults(CharSequence constraint, FilterResults results){
             filterd = (List<Handphone>) results.values;
             notifyDataSetChanged();
         }

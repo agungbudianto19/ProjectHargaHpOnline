@@ -1,10 +1,9 @@
 package com.examples.jualbelihp;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,16 +26,18 @@ import com.examples.jualbelihp.model.Handphone;
 import com.examples.jualbelihp.server.AsyncInvokeURLTask;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.Attributes;
 
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
-    private static  final String TAG = "MainActivity";
+
+public class MainActivity<refresh> extends AppCompatActivity implements SearchView.OnQueryTextListener {
+    private static final String TAG = "MainActivity";
+    public static final String urlDelete = "delete_phone.php";
     private ListView listView;
     private ActionMode actionMode;
     private ActionMode.Callback amCallback;
@@ -47,7 +48,8 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = (ListView) findViewById(R.id.listView_main);
+
+        listView = (ListView) findViewById(R.id.listview_main);
         amCallback = new ActionMode.Callback() {
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -55,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                actionmode = null;
+                actionMode = null;
             }
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -80,62 +82,69 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         loadDataHP();
     }
     private void showUpdateForm() {
-        Intent in = new Intent(getApplicationContext(), FormHandphone.class);
-        in.putExtra("id", selectedList.getId().toString());
+        Intent in = new Intent(getApplicationContext(), FormHandphone.class);in.putExtra("id", selectedList.getId().toString());
         in.putExtra("nama", selectedList.getNama());
         in.putExtra("harga", selectedList.getHarga());
         startActivity(in);
     }
-    private void delete(){
+    private void delete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Delete " + selectedList.getNama() + " ?");
         builder.setTitle("Delete");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                listhp.remove(listhp.indexOf(selectedList));
+                //listhp.remove(listhp.indexOf(selectedList));
+                deleteData();
                 Toast.makeText(getApplicationContext(), "deleted", Toast.LENGTH_SHORT).show();
             }
         });
-        AlertDialog alert = builder.creater();
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = builder.create();
         alert.setIcon(android.R.drawable.ic_menu_delete);
         alert.show();
     }
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager)
+                getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchItem = menu.findItem(R.id.option_menu_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        SearchView searchView = (SearchView)
+                searchItem.getActionView();
         if (searchView == null) {
             MenuItemCompat.setShowAsAction(searchItem, MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_ALWAYS);
             MenuItemCompat.setActionView(searchItem, searchView = new SearchView(MainActivity.this));
         }
-        int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null null);
+        int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
         TextView textView = (TextView) searchView.findViewById(id);
         textView.setTextColor(Color.WHITE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("nama");
-        return true;
-    }
+        return true;}
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.option_menu_new:
-                Intent in = new Iintent(getApplicationContext(), FormHandphone.class);
+                Intent in = new Intent(getApplicationContext(),
+                        FormHandphone.class);
                 startActivity(in);
                 break;
         }
         return super.onOptionsItemSelected(item);
-            }
-            private void processResponse(String response) {
+    }
+    private void processResponse(String response) {
         try {
             JSONObject jsonObj = new JSONObject(response);
-            JSONArray jsonArray = jsonObj.getJSONArray("Handphone");
-            Log.d(TAG, "data length: "+ jsonArray.length());
+            JSONArray jsonArray = jsonObj.getJSONArray("handphone");
+            Log.d(TAG, "data length: " + jsonArray.length());
             Handphone handphone = null;
-            for(int i = 0; i < jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 handphone = new Handphone();
                 handphone.setId(obj.getInt("id"));
@@ -143,7 +152,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 handphone.setHarga(obj.getString("harga"));
                 this.listhp.add(handphone);
             }
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             Log.d(TAG, e.getMessage());
         }
     }
@@ -152,7 +161,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         listView.setAdapter(adapter);
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View v, int pos, long id) {
                 if (actionMode != null) {
                     return false;
                 }
@@ -164,7 +173,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> adapterView, View v, int pos,long id) {
                 selectedList = (Handphone) adapter.getItem(pos);
                 Intent in = new Intent(getApplicationContext(), DetailHandphone.class);
                 in.putExtra("id", selectedList.getId().toString());
@@ -174,53 +183,61 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
         });
     }
-    public void loadDataHP(){
-    try{
-    ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(0);
-        AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener(){
-            @Override
-            public void onPostExecute(String result){
-                Log.d("TAG", "Login:" + result);
-                if (result.equals("timeout") || result.trim().equalsIgnoreCase("Tidak Dapat Terkoneksi Ke Data Base")){
-                    Toast.makeText(getBaseContext(), "Tidak Dapat Terkoneksi Dengan Server", Toast.LENGTH_SHORT).show();
-                }else{
-                    processResponse(result);
-                    populateListView();
-                }
-            }
-        });
-        task.showdialog = true;
-        task.message = "Load Data HP Please Wait..";
-        task.applicationContext = MainActivity.this;
-        task.mNoteItWebUrl ="list_phone.php";
-        task.execute();
-    }catch (Exception e) {
-        e.printStackTrace();
-    }
-    }
-    public void deleteData() {
+    public void loadDataHP() {
         try {
             ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(0);
-            AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener(){
+            AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener() {
                 @Override
-                public void onPostExecute(String result){
+                public void onPostExecute(String result) {
+//TODO Auto-generated method stub
                     Log.d("TAG", "Login:" + result);
-                    if (result.equals("timeout") || result.trim().equalsIgnoreCase("Tidak Dapat Tterkoneksi Ke Datab Base")){
-                        Toast.makeText(getBaseContext(), "Tidak Dapat Terkoneksi Dengan Server", Toast.LENGTH_SHORT).show();
-                    }else{
+                    if (result.equals("timeout") || result.trim().equalsIgnoreCase("Tidak dapat Terkoneksi ke Data Base")) {
+                        Toast.makeText(getBaseContext(), "Tidak Dapat Terkoneksi dengn Server", Toast.LENGTH_SHORT).show();
+                    } else {
                         processResponse(result);
                         populateListView();
                     }
                 }
             });
             task.showdialog = true;
-            task.message = "Load Data HP Harap Tunggu..";
+            task.message = "Load Data HP Please Wait...";
             task.applicationContext = MainActivity.this;
-            task.mNoteItWebUrl = "/select_all.php";
+            task.mNoteItWebUrl = "list_phone.php";
             task.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public void deleteData() {
+        try {
+            ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(0);
+            nameValuePairs.add(new BasicNameValuePair("id", String.valueOf(selectedList.getId())));
+            AsyncInvokeURLTask task = new AsyncInvokeURLTask(nameValuePairs, new AsyncInvokeURLTask.OnPostExecuteListener() {
+                @Override
+                public void onPostExecute(String result) {
+                    Log.d("TAG", "Login:" + result);
+                    if (result.equals("timeout") ||result.trim().equalsIgnoreCase("Tidak dapat Terkoneksi ke Data Base")) {
+                        Toast.makeText(getBaseContext(), "Tidak Dapat Terkoneksi dengn Server", Toast.LENGTH_SHORT).show();
+                    } else {
+                        processResponse(result);
+                        populateListView();
+                        goToMainActivity();
+                    }
+                }
+            });
+            task.showdialog = true;
+            task.message = "Load Data HP Harap Tunggu..";
+            task.applicationContext = MainActivity.this;
+            task.mNoteItWebUrl = urlDelete;
+            task.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void goToMainActivity() {
+        Intent in = new Intent(getApplicationContext(), MainActivity.class);
+        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(in);
     }
     @Override
     public boolean onQueryTextChange(String newText) {
