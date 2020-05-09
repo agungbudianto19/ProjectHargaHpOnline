@@ -20,14 +20,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class AsyncInvokeURLTask extends AsyncTask<Void, Void, String> {
-    public String mNoteItWebUrl = "com.examples.jualbelihp";
+    public String mNoteItWebUrl = "com.example.jualbelihp";
     private ArrayList<NameValuePair> mParams;
     private OnPostExecuteListener mPostExecuteListener = null;
     private ProgressDialog dialog;
     public boolean showdialog =false;
     public String message ="Proses Data";
 
-    public String url_server ="https://protugas.000webhostapp.com/phone/";
+    public String url_server ="https://agungbudianto.000webhostapp.com/xphone/";
     public Context applicationContext;
     public static interface OnPostExecuteListener{
         void onPostExecute(String result);
@@ -42,7 +42,7 @@ public class AsyncInvokeURLTask extends AsyncTask<Void, Void, String> {
     public void onPreExecute() {
         if (showdialog)
             this.dialog =
-                    ProgressDialog.show(applicationContext,message, "Silakan Menunggu...",
+                    ProgressDialog.show(applicationContext,message, "Silahkan Menunggu...",
                             true);
     }
     @Override
